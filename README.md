@@ -28,6 +28,12 @@ add_subdirectory(lib/pico-simple-pwm)
 
 # Add the library to your project
 target_link_libraries(your_project pico_simple_pwm)
+
+# Add the standard include files to the build
+target_include_directories(simple_pwm_dev PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}
+        ${CMAKE_CURRENT_LIST_DIR}/lib/pico-simple-pwm # Add this line
+)
 ```
 
 ## Usage
