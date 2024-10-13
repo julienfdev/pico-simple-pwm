@@ -64,6 +64,11 @@ void SimplePwm::on(const int duty_cycle) {
     m_duty_cycle = duty_cycle;
     m_enabled = true;
 
+    // Let's deinit and reinit the PWM slice
+    gpio_deinit(m_gpio);
+    gpio_init(m_gpio);
+    gpio_set_function(m_gpio, GPIO_FUNC_PWM);
+
     if (duty_cycle < 0 || duty_cycle > 100) {
         panic("Invalid duty cycle");
     }
@@ -77,6 +82,10 @@ void SimplePwm::off() {
     m_enabled = false;
 
     pwm_set_enabled(m_slice, m_enabled);
+
+    gpio_deinit(m_gpio);
+    gpio_init(m_gpio);
+    gpio_set_dir(m_gpio, GPIO_OUT);
     gpio_put(m_gpio, m_enabled);
 }
 
@@ -85,8 +94,12 @@ void SimplePwm::setGpio(const int gpio) {
         panic("Invalid GPIO pin");
     }
 
-    // Force disabling current PWM signal
+    // Force disabling current PWM signal, and shutting down the output
     pwm_set_enabled(m_slice, false);
+    gpio_deinit(m_gpio);
+    gpio_init(m_gpio);
+    gpio_set_dir(m_gpio, GPIO_OUT);
+    gpio_put(m_gpio, false);
 
     m_gpio = gpio;
 
